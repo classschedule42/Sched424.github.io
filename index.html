@@ -1,1437 +1,369 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Introduce</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0014;
-            color: white;
-            min-height: 100vh;
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .loading-screen {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            background: #0a0014;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            animation: fadeOut 0.5s ease-in-out 0.7s forwards;
-        }
-
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                visibility: hidden;
-            }
-        }
-
-        .loader {
-            width: 80px;
-            height: 80px;
-            border: 8px solid rgba(138, 43, 226, 0.2);
-            border-top: 8px solid #8a2be2;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .schedule-icon {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(138, 43, 226, 0.8);
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(138, 43, 226, 0.5);
-        }
-
-        .schedule-icon:hover {
-            background: rgba(138, 43, 226, 1);
-            transform: scale(1.1);
-        }
-
-        .schedule-icon svg {
-            width: 30px;
-            height: 30px;
-            fill: white;
-        }
-
-        .schedule-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 5000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .schedule-modal.active {
-            display: flex;
-        }
-
-        .schedule-content {
-            background: rgba(20, 10, 40, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 1400px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 2px solid rgba(138, 43, 226, 0.5);
-            box-shadow: 0 8px 40px rgba(138, 43, 226, 0.3);
-            position: relative;
-        }
-
-        .schedule-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .schedule-header h2 {
-            font-size: 2.5rem;
-            color: #da70d6;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(138, 43, 226, 0.6);
-        }
-
-        .schedule-header p {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .current-status {
-            background: rgba(138, 43, 226, 0.9);
-            border-radius: 15px;
-            padding: 20px 30px;
-            border: 2px solid rgba(218, 112, 214, 0.6);
-            box-shadow: 0 8px 30px rgba(138, 43, 226, 0.5);
-            min-width: 280px;
-            animation: statusPulse 2s ease-in-out infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes statusPulse {
-            0%, 100% { box-shadow: 0 8px 30px rgba(138, 43, 226, 0.5); }
-            50% { box-shadow: 0 8px 40px rgba(138, 43, 226, 0.8); }
-        }
-
-        .status-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .status-content {
-            font-size: 1.3rem;
-            color: #ffffff;
-            font-weight: 700;
-            text-shadow: 0 2p
-        }
-
-        .time-remaining {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 600;
-        }
-
-        .time-remaining.warning {
-            color: #ff6b6b;
-            animation: warningBlink 1s ease-in-out infinite;
-        }
-
-        @keyframes warningBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .current-class.transitioning {
-            animation: slideTransition 1.5s ease-in-out;
-        }
-
-        @keyframes slideTransition {
-            0% {
-                transform: translateX(-20px) scale(1.05);
-                opacity: 0.5;
-            }
-            50% {
-                transform: translateX(10px) scale(1.05);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateX(0) scale(1.05);
-                opacity: 1;
-            }
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            background: rgba(138, 43, 226, 0.8);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        .close-btn:hover {
-            background: rgba(138, 43, 226, 1);
-            transform: rotate(90deg);
-        }
-
-        .schedule-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .schedule-table th,
-        .schedule-table td {
-            border: 1px solid rgba(138, 43, 226, 0.3);
-            padding: 12px 8px;
-            text-align: center;
-            vertical-align: top;
-            transition: all 0.3s ease;
-        }
-
-        .schedule-table th {
-            background: rgba(138, 43, 226, 0.3);
-            color: #da70d6;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .schedule-table td {
-            background: rgba(20, 10, 40, 0.5);
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.95rem;
-        }
-
-        .schedule-table .period-col {
-            background: rgba(138, 43, 226, 0.25);
-            font-weight: 700;
-            color: #8a2be2;
-            vertical-align: middle;
-        }
-
-        .subject-name {
-            font-weight: 700;
-            color: #da70d6;
-            margin-bottom: 3px;
-            font-size: 0.9rem;
-        }
-
-        .teacher-room {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.4;
-        }
-
-        .empty-cell {
-            color: rgba(255, 255, 255, 0.4);
-            font-style: italic;
-            vertical-align: middle;
-        }
-
-        .schedule-table {
-            position: relative;
-        }
-
-        .highlight-overlay {
-            position: absolute;
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.5) 0%, rgba(218, 112, 214, 0.5) 100%);
-            border: 2px solid #da70d6;
-            box-shadow: 0 0 30px rgba(138, 43, 226, 0.6), inset 0 0 20px rgba(218, 112, 214, 0.3);
-            animation: highlightPulse 2s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 100;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 4px;
-        }
-
-        .current-class .subject-name {
-            position: relative;
-            z-index: 101;
-        }
-
-        .current-class .teacher-room {
-            position: relative;
-            z-index: 101;
-        }
-
-        @keyframes highlightPulse {
-            0%, 100% { 
-                box-shadow: 0 0 30px rgba(138, 43, 226, 0.6), inset 0 0 20px rgba(218, 112, 214, 0.3);
-            }
-            50% { 
-                box-shadow: 0 0 50px rgba(138, 43, 226, 0.9), inset 0 0 30px rgba(218, 112, 214, 0.5);
-            }
-        }
-
-        .current-class .subject-name {
-            color: #ffffff;
-            font-size: 1rem;
-            text-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
-        }
-
-        .current-class .teacher-room {
-            color: rgba(255, 255, 255, 0.95);
-            font-size: 0.8rem;
-        }
-
-        .container {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            opacity: 0;
-            animation: fadeIn 0.5s ease-in-out 1.2s forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        .profile-card {
-            background: rgba(20, 10, 40, 0.7);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 50px 70px;
-            box-shadow: 0 8px 40px rgba(138, 43, 226, 0.3), 
-                        0 0 60px rgba(138, 43, 226, 0.2);
-            border: 1px solid rgba(138, 43, 226, 0.3);
-            max-width: 700px;
-            width: 100%;
-            transform: translateY(30px);
-            animation: slideUp 1s ease-out 0.8s forwards;
-        }
-
-        @keyframes slideUp {
-            to {
-                transform: translateY(0);
-            }
-        }
-
-        .title-header {
-            font-size: 3rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 40px;
-            color: #da70d6;
-            text-shadow: 0 0 30px rgba(138, 43, 226, 0.8);
-        }
-
-        .info-line {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: rgba(255, 255, 255, 0.95);
-            min-height: 40px;
-        }
-
-        .info-line:last-child {
-            margin-bottom: 0;
-        }
-
-        .label {
-            color: #8a2be2;
-            font-weight: 600;
-        }
-
-        .description-box {
-            margin-top: 30px;
-            background: rgba(15, 5, 30, 0.6);
-            border-radius: 15px;
-            padding: 25px;
-            border-left: 4px solid #8a2be2;
-            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.2);
-        }
-
-        .description-box .label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-        }
-
-        .description-text {
-            font-size: 1.4rem;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.85);
-            min-height: 80px;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.2em;
-            background: #8a2be2;
-            margin-left: 3px;
-            animation: blink 0.7s infinite;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        .scroll-container {
-            position: relative;
-            z-index: 10;
-            padding: 100px 20px;
-        }
-
-        .homework-section {
-            max-width: 800px;
-            margin: 0 auto;
-            opacity: 0;
-            transform: translateY(100px);
-            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .homework-section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .homework-card {
-            background: rgba(20, 10, 40, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 40px rgba(138, 43, 226, 0.3);
-            border: 1px solid rgba(138, 43, 226, 0.3);
-            transform: scale(0.9);
-            opacity: 0;
-        }
-
-        .homework-section.visible .homework-card {
-            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        @keyframes popIn {
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .homework-section.visible .homework-card:nth-child(2) { animation-delay: 0.1s; }
-        .homework-section.visible .homework-card:nth-child(3) { animation-delay: 0.2s; }
-        .homework-section.visible .homework-card:nth-child(4) { animation-delay: 0.3s; }
-        .homework-section.visible .homework-card:nth-child(5) { animation-delay: 0.4s; }
-        .homework-section.visible .homework-card:nth-child(6) { animation-delay: 0.5s; }
-        .homework-section.visible .homework-card:nth-child(7) { animation-delay: 0.6s; }
-        .homework-section.visible .homework-card:nth-child(8) { animation-delay: 0.7s; }
-
-        .subject-title {
-            font-size: 2rem;
-            color: #8a2be2;
-            font-weight: 700;
-            margin-bottom: 20px;
-            border-bottom: 2px solid rgba(138, 43, 226, 0.5);
-            padding-bottom: 10px;
-        }
-
-        .task-item {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 12px;
-            padding-left: 25px;
-            position: relative;
-            line-height: 1.6;
-        }
-
-        .task-date {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.5);
-            font-style: italic;
-            margin-left: 8px;
-        }
-
-        .no-tasks {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.5);
-            font-style: italic;
-            text-align: center;
-            padding: 20px 0;
-        }
-    
-
-@media (max-width: 768px) {
-    .profile-card {
-        padding: 40px 30px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตารางเรียน ม.5/4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --cream:#FBF8F3;
+  --warm:#F5EFE6;
+  --sand:#E8DDD0;
+  --clay:#C9B8A8;
+  --terracotta:#C07A5A;
+  --ink:#2C2416;
+  --muted:#7A6E64;
+  --accent:#D4956A;
 }
-    .info-line {
-        font-size: 1.3rem;
-    }
-    .description-text {
-        font-size: 1.2rem;
-    }
-    .title-header {
-        font-size: 2.2rem;
-    }
-    .subject-title {
-        font-size: 1.6rem;
-    }
-    .task-item {
-        font-size: 1.1rem;
-    }
-    .homework-card {
-        padding: 30px 20px;
-    }
-    .schedule-content {
-        padding: 20px 10px;
-        max-height: 90vh;
-    }
-    .schedule-header h2 {
-        font-size: 1.8rem;
-        margin-bottom: 8px;
-    }
-    .schedule-header p {
-        font-size: 1rem;
-    }
-    
-    .schedule-table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        margin-top: 15px;
-        border-radius: 10px;
-    }
-    
-    .schedule-table {
-        min-width: 800px; 
-        width: 100%;
-    }
-    
-    .schedule-table th,
-    .schedule-table td {
-        padding: 10px 8px;
-        font-size: 0.8rem;
-        white-space: normal;
-    }
-    .schedule-table th {
-        font-size: 0.85rem;
-        position: sticky;
-        top: 0;
-        background: rgba(138, 43, 226, 0.4);
-        z-index: 10;
-    }
-    .schedule-table .period-col {
-        position: sticky;
-        left: 0;
-        background: rgba(138, 43, 226, 0.35);
-        z-index: 5;
-        font-size: 0.9rem;
-    }
-    .subject-name {
-        font-size: 0.85rem;
-        margin-bottom: 4px;
-    }
-    .teacher-room {
-        font-size: 0.7rem;
-        line-height: 1.3;
-    }
-    .current-status {
-        position: fixed;
-        bottom: 20px;
-        left: 10px;
-        right: auto;
-        margin: 0;
-        width: auto;
-        max-width: calc(100% - 20px);
-        padding: 15px 20px;
-        min-width: auto;
-    }
-    .status-label {
-        font-size: 0.8rem;
-        margin-bottom: 6px;
-    }
-    .status-content {
-        font-size: 1.1rem;
-    }
-    .close-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.4rem;
-        top: 10px;
-        right: 10px;
-    }
-    .schedule-icon {
-        width: 50px;
-        height: 50px;
-        top: 15px;
-        right: 15px;
-    }
-    .schedule-icon svg {
-        width: 28px;
-        height: 28px;
-    }
-    .current-class {
-        transform: scale(1);
-    }
-    .current-class .subject-name {
-        font-size: 0.9rem;
-    }
-    .current-class .teacher-room {
-        font-size: 0.75rem;
-    }
-
-@media (max-width: 768px) {
-    .profile-card {
-        padding: 30px 20px;
-        margin: 20px 10px;
-    }
-    .info-line {
-        font-size: 1.1rem;
-        margin-bottom: 15px;
-        word-wrap: break-word;
-    }
-    .description-text {
-        font-size: 1rem;
-        line-height: 1.5;
-    }
-    .title-header {
-        font-size: 1.8rem;
-        margin-bottom: 30px;
-    }
-    .description-box {
-        padding: 20px 15px;
-        margin-top: 20px;
-    }
-    .description-box .label {
-        font-size: 1.1rem;
-        margin-bottom: 8px;
-    }
-    .subject-title {
-        font-size: 1.4rem;
-    }
-    .task-item {
-        font-size: 1rem;
-        padding-left: 20px;
-    }
-    .homework-card {
-        padding: 25px 15px;
-        margin-bottom: 20px;
-    }
-    .scroll-container {
-        padding: 80px 15px;
-    }
-    
-    .schedule-content {
-        padding: 20px 10px;
-        max-height: 90vh;
-    }
-    .schedule-header h2 {
-        font-size: 1.8rem;
-        margin-bottom: 8px;
-    }
-    .schedule-header p {
-        font-size: 1rem;
-    }
-    
-    .schedule-table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        margin-top: 15px;
-        border-radius: 10px;
-    }
-    
-    .schedule-table {
-        min-width: 800px;
-        width: 100%;
-    }
-    
-    .schedule-table th,
-    .schedule-table td {
-        padding: 10px 8px;
-        font-size: 0.8rem;
-        white-space: normal;
-    }
-    .schedule-table th {
-        font-size: 0.85rem;
-        position: sticky;
-        top: 0;
-        background: rgba(138, 43, 226, 0.4);
-        z-index: 10;
-    }
-    .schedule-table .period-col {
-        position: sticky;
-        left: 0;
-        background: rgba(138, 43, 226, 0.35);
-        z-index: 5;
-        font-size: 0.9rem;
-    }
-    .subject-name {
-        font-size: 0.85rem;
-        margin-bottom: 4px;
-    }
-    .teacher-room {
-        font-size: 0.7rem;
-        line-height: 1.3;
-    }
-    .current-status {
-        position: static;
-        margin: 0 auto 20px;
-        width: calc(100% - 20px);
-        padding: 15px 20px;
-        min-width: auto;
-    }
-    .status-label {
-        font-size: 0.8rem;
-        margin-bottom: 6px;
-    }
-    .status-content {
-        font-size: 1.1rem;
-    }
-    .close-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.4rem;
-        top: 10px;
-        right: 10px;
-    }
-    .schedule-icon {
-        width: 50px;
-        height: 50px;
-        top: 15px;
-        right: 15px;
-    }
-    .schedule-icon svg {
-        width: 28px;
-        height: 28px;
-    }
-    .current-class {
-        transform: scale(1);
-    }
-    .current-class .subject-name {
-        font-size: 0.9rem;
-    }
-    .current-class .teacher-room {
-        font-size: 0.75rem;
-    }
+html,body{min-height:100vh;background:var(--cream);font-family:'Sarabun',sans-serif;color:var(--ink);overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%,rgba(201,184,168,.2) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 80%,rgba(192,122,90,.1) 0%,transparent 55%);
 }
+.page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
 
-@media (max-width: 480px) {
-    .container {
-        padding: 15px 10px;
-    }
-    .profile-card {
-        padding: 25px 15px;
-        margin: 10px 5px;
-    }
-    .title-header {
-        font-size: 1.5rem;
-        margin-bottom: 25px;
-    }
-    .info-line {
-        font-size: 0.95rem;
-        margin-bottom: 12px;
-        min-height: auto;
-    }
-    .description-box {
-        padding: 15px 12px;
-        margin-top: 15px;
-    }
-    .description-box .label {
-        font-size: 1rem;
-        margin-bottom: 6px;
-    }
-    .description-text {
-        font-size: 0.9rem;
-        line-height: 1.4;
-        min-height: auto;
-    }
-    .homework-card {
-        padding: 20px 12px;
-        margin-bottom: 15px;
-    }
-    .subject-title {
-        font-size: 1.2rem;
-        margin-bottom: 15px;
-    }
-    .task-item {
-        font-size: 0.9rem;
-        padding-left: 18px;
-        margin-bottom: 10px;
-    }
-    .scroll-container {
-        padding: 60px 10px;
-    }
-    
-    .schedule-content {
-        padding: 15px 8px;
-    }
-    .schedule-header h2 {
-        font-size: 1.5rem;
-    }
-    .schedule-header p {
-        font-size: 0.85rem;
-    }
-    
-    .schedule-table {
-        min-width: 700px;
-    }
-    
-    .schedule-table th,
-    .schedule-table td {
-        padding: 8px 6px;
-        font-size: 0.7rem;
-    }
-    .schedule-table th {
-        font-size: 0.75rem;
-    }
-    .schedule-table .period-col {
-        font-size: 0.8rem;
-        min-width: 45px;
-    }
-    .subject-name {
-        font-size: 0.75rem;
-        margin-bottom: 3px;
-    }
-    .teacher-room {
-        font-size: 0.6rem;
-    }
-    .current-status {
-        position: fixed;
-        bottom: 15px;
-        left: 8px;
-        padding: 12px 15px;
-        max-width: calc(100% - 16px);
-    }
-    .status-label {
-        font-size: 0.75rem;
-    }
-    .status-content {
-        font-size: 1rem;
-    }
-}
+header{text-align:center;margin-bottom:2.5rem}
+.badge{display:inline-block;background:var(--sand);color:var(--muted);font-family:'Kanit',sans-serif;font-size:.72rem;font-weight:400;letter-spacing:.12em;padding:5px 14px;border-radius:20px;margin-bottom:.9rem;text-transform:uppercase}
+h1{font-family:'Kanit',sans-serif;font-size:clamp(1.6rem,4vw,2.6rem);font-weight:500;color:var(--ink);line-height:1.15;margin-bottom:.4rem}
+h1 span{color:var(--terracotta)}
+.sub{font-size:.9rem;color:var(--muted);font-weight:300}
 
-@media (max-width: 360px) {
-    .profile-card {
-        padding: 20px 12px;
-    }
-    .title-header {
-        font-size: 1.3rem;
-        margin-bottom: 20px;
-    }
-    .info-line {
-        font-size: 0.85rem;
-        margin-bottom: 10px;
-    }
-    .description-box {
-        padding: 12px 10px;
-    }
-    .description-text {
-        font-size: 0.8rem;
-    }
-    .subject-title {
-        font-size: 1.1rem;
-    }
-    .task-item {
-        font-size: 0.85rem;
-    }
-    .schedule-table {
-        min-width: 650px;
-    }
+.now-card{background:var(--ink);color:var(--cream);border-radius:18px;padding:1.2rem 1.8rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+.now-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.now-label{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;opacity:.5;font-family:'Kanit',sans-serif;font-weight:300}
+.now-text{font-family:'Kanit',sans-serif;font-size:1.05rem;font-weight:500}
+.now-time{margin-left:auto;font-family:'Kanit',sans-serif;font-size:1.8rem;font-weight:300;opacity:.7;letter-spacing:.05em}
+.now-remain{width:100%;font-size:.8rem;opacity:.55;font-weight:300;border-top:1px solid rgba(255,255,255,.1);padding-top:.6rem;margin-top:.2rem}
+.now-remain.warn{opacity:1;color:#FFAA80;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+.week-tabs{display:flex;gap:6px;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.week-tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;border:1.5px solid var(--sand);background:transparent;color:var(--muted);font-family:'Kanit',sans-serif;font-size:.85rem;font-weight:400;padding:7px 18px;border-radius:30px;cursor:pointer;transition:all .2s}
+.tab-btn:hover{border-color:var(--clay);color:var(--ink)}
+.tab-btn.today{border-color:var(--terracotta);color:var(--terracotta)}
+.tab-btn.active{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.tab-btn.active.today{background:var(--terracotta);border-color:var(--terracotta);color:#fff}
+
+.day-view{display:none}
+.day-view.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.periods-grid{display:grid;gap:10px}
+.period-row{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:stretch}
+.period-num{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.p-num{font-family:'Kanit',sans-serif;font-size:1.3rem;font-weight:300;color:var(--clay);line-height:1}
+.p-time{font-size:.58rem;color:var(--clay);text-align:center;line-height:1.3;opacity:.7}
+
+.period-card{border-radius:14px;padding:1rem 1.3rem;border:1.5px solid transparent;transition:all .2s;position:relative;overflow:hidden;min-height:72px;display:flex;flex-direction:column;justify-content:center}
+.period-card.empty{background:var(--warm);border-color:var(--sand)}
+.period-card.break-card{background:var(--warm);border-color:var(--sand);flex-direction:row;align-items:center;gap:8px;min-height:52px}
+.break-text{font-size:.8rem;color:var(--muted);font-weight:300}
+.period-card.has-class{background:#fff;border-color:var(--sand)}
+.period-card.has-class:hover{border-color:var(--clay);transform:translateX(2px)}
+.period-card.current{background:var(--ink) !important;border-color:var(--ink) !important}
+.period-card.current .subj{color:var(--cream) !important}
+.period-card.current .meta{color:rgba(251,248,243,.55) !important}
+.period-card.current .color-tag{opacity:.4}
+
+.color-tag{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
+.subj{font-family:'Kanit',sans-serif;font-size:1rem;font-weight:500;color:var(--ink);margin-bottom:3px}
+.meta{font-size:.78rem;color:var(--muted);font-weight:300;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.room-tag{background:var(--warm);border:1px solid var(--sand);border-radius:6px;padding:1px 7px;font-size:.7rem;color:var(--muted);font-weight:400;flex-shrink:0}
+
+.full-table-wrap{margin-top:2rem}
+.section-label{font-family:'Kanit',sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-bottom:1rem;font-weight:400}
+.tbl-scroll{overflow-x:auto;border-radius:16px;border:1.5px solid var(--sand)}
+table{width:100%;border-collapse:collapse;min-width:780px;background:#fff}
+thead tr{background:var(--warm)}
+thead th{font-family:'Kanit',sans-serif;font-size:.72rem;font-weight:400;color:var(--muted);letter-spacing:.05em;padding:10px 6px;text-align:center;border-bottom:1.5px solid var(--sand);white-space:nowrap;line-height:1.4}
+thead th:first-child{text-align:left;padding-left:16px;min-width:56px}
+tbody tr{border-bottom:1px solid var(--sand)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--cream)}
+tbody td{padding:9px 6px;text-align:center;vertical-align:middle;font-size:.76rem}
+tbody td:first-child{text-align:left;padding-left:16px;font-family:'Kanit',sans-serif;font-size:.9rem;font-weight:500;color:var(--muted);white-space:nowrap}
+.ci{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
+.cs{font-family:'Kanit',sans-serif;font-size:.76rem;font-weight:500;color:var(--ink);line-height:1.2}
+.ct{font-size:.62rem;color:var(--muted);font-weight:300}
+.cr{font-size:.6rem;color:var(--terracotta);font-weight:400;background:#FEF3EE;border-radius:4px;padding:1px 5px}
+.ce{color:var(--clay);font-size:.68rem;opacity:.4}
+td.tbl-current{background:var(--ink) !important}
+td.tbl-current .cs{color:var(--cream)}
+td.tbl-current .ct{color:rgba(251,248,243,.5)}
+td.tbl-current .cr{background:rgba(255,255,255,.15);color:rgba(251,248,243,.7)}
+
+@media(max-width:600px){
+  .page{padding:1.5rem 1rem 3rem}
+  h1{font-size:1.4rem}
+  .now-time{font-size:1.3rem}
+  .period-row{grid-template-columns:44px 1fr}
+  .full-table-wrap{display:none}
 }
-    </style>
+</style>
 </head>
 <body>
-    <canvas id="canvas"></canvas>
+<div class="page">
 
-    <div class="loading-screen">
-        <div class="loader"></div>
-    </div>
+<header>
+  <div class="badge">ภาคเรียนที่ 1 / 2569</div>
+  <h1>ตารางเรียน <span>ม.5/4</span></h1>
+  <p class="sub">โรงเรียนศรีกระนวนวิทยาคม &nbsp;·&nbsp; ห้องประจำ 431</p>
+</header>
 
-    <div class="schedule-icon" onclick="toggleSchedule()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
-            <path d="M7 10h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
-        </svg>
-    </div>
+<div class="now-card">
+  <div class="now-dot"></div>
+  <div>
+    <div class="now-label">ตอนนี้</div>
+    <div class="now-text" id="nowText">กำลังโหลด...</div>
+  </div>
+  <div class="now-time" id="nowTime">--:--</div>
+  <div class="now-remain" id="nowRemain" style="display:none"></div>
+</div>
 
-    <div class="schedule-modal" id="scheduleModal">
-        <div class="schedule-content">
-            <button class="close-btn" onclick="toggleSchedule()">×</button>
-            
-                <div class="current-status" id="currentStatus">
-                <div class="status-label">เวลาปัจจุบัน: <span id="currentTime">--:--</span></div>
-                <div class="status-content" id="statusText">กำลังโหลด...</div>
-                <div class="time-remaining" id="timeRemaining" style="display: none;">หมดคาบเวลา: <span id="endTime">--:--</span></div>
-            </div>
-            
-            <div class="schedule-header">
-                <h2>ตารางเรียน</h2>
-                <p>ชั้น ม.4/2 | ห้องประจำ 422 | ภาคเรียนที่ 2/2568</p>
-            </div>
-                <div style="position: relative;">
-                <div class="highlight-overlay" id="highlightOverlay" style="display: none;"></div>
-                <table class="schedule-table" id="scheduleTable">
-                <thead>
-                    <tr>
-                        <th>คาบที่<br>เวลา</th>
-                        <th>0<br>08:00-08:40</th>
-                        <th>1<br>08:40-09:35</th>
-                        <th>2<br>09:35-10:30</th>
-                        <th>3<br>10:30-11:25</th>
-                        <th>4<br>11:25-12:20</th>
-                        <th>5<br>12:20-13:15</th>
-                        <th>6<br>13:15-14:10</th>
-                        <th>7<br>14:10-15:05</th>
-                        <th>8<br>15:05-16:00</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="period-col">จ.</td>
-                        <td class="empty-cell" data-day="1" data-period="0">ว่าง</td>
-                        <td data-day="1" data-period="1"><div class="subject-name">เคมี</div><div class="teacher-room">ครูเฉลียว<br>422</div></td>
-                        <td data-day="1" data-period="2"><div class="subject-name">ไทย</div><div class="teacher-room">ครูมลศรี<br>422</div></td>
-                        <td data-day="1" data-period="3"><div class="subject-name">ฟิสิกส์</div><div class="teacher-room">ครูวรวุฒิ<br>422</div></td>
-                        <td data-day="1" data-period="4"><div class="subject-name">ฟิสิกส์</div><div class="teacher-room">ครูวรวุฒิ<br>422</div></td>
-                        <td class="empty-cell" data-day="1" data-period="5">พักเที่ยง<br>ม.ปลาย</td>
-                        <td data-day="1" data-period="6"><div class="subject-name">คณิตศาสตร์</div><div class="teacher-room">ครูดวงสมร<br>325</div></td>
-                        <td data-day="1" data-period="7"><div class="subject-name">IS</div><div class="teacher-room">ครูมลศรี<br>422</div></td>
-                        <td data-day="1" data-period="8"><div class="subject-name">IS</div><div class="teacher-room">ครูมลศรี<br>422</div></td>
-                    </tr>
-                    <tr>
-                        <td class="period-col">อ.</td>
-                        <td class="empty-cell" data-day="2" data-period="0">ว่าง</td>
-                        <td data-day="2" data-period="1"><div class="subject-name">ต้านทุจริตศึกษา</div><div class="teacher-room">-<br>-</div></td>
-                        <td data-day="2" data-period="2"><div class="subject-name">ชีววิทยา</div><div class="teacher-room">ครูกฤตน<br>422</div></td>
-                        <td data-day="2" data-period="3"><div class="subject-name">ชีววิทยา</div><div class="teacher-room">ครูกฤตน<br>422</div></td>
-                        <td data-day="2" data-period="4"><div class="subject-name">คณิตศาสตร์</div><div class="teacher-room">ครูดวงสมร<br>325</div></td>
-                        <td class="empty-cell" data-day="2" data-period="5">พักเที่ยง<br>ม.ปลาย</td>
-                        <td data-day="2" data-period="6"><div class="subject-name">อังกฤษ</div><div class="teacher-room">ครูนันทิยา<br>422</div></td>
-                        <td data-day="2" data-period="7"><div class="subject-name">ฟิสิกส์</div><div class="teacher-room">ครูวรวุฒิ<br>422</div></td>
-                        <td data-day="2" data-period="8"><div class="subject-name">ฟิสิกส์</div><div class="teacher-room">ครูวรวุฒิ<br>422</div></td>
-                    </tr>
-                    <tr>
-                        <td class="period-col">พ.</td>
-                        <td class="empty-cell" data-day="3" data-period="0">ว่าง</td>
-                        <td data-day="3" data-period="1"><div class="subject-name">ดาราศาสตร์</div><div class="teacher-room">ครูวิชชุด<br>422</div></td>
-                        <td data-day="3" data-period="2"><div class="subject-name">ดาราศาสตร์</div><div class="teacher-room">ครูวิชชุด<br>422</div></td>
-                        <td data-day="3" data-period="3"><div class="subject-name">พละศึกษา</div><div class="teacher-room">ครูนฤพล<br>สนามอินดอร์</div></td>
-                        <td data-day="3" data-period="4"><div class="subject-name">สังคม</div><div class="teacher-room">ครูศิลายุ<br>324</div></td>
-                        <td class="empty-cell" data-day="3" data-period="5">พักเที่ยง<br>ม.ปลาย</td>
-                        <td data-day="3" data-period="6"><div class="subject-name">คณิตศาสตร์</div><div class="teacher-room">ครูดวงสมร<br>325</div></td>
-                        <td data-day="3" data-period="7"><div class="subject-name">เคมี</div><div class="teacher-room">ครูเฉลียว<br>422</div></td>
-                        <td data-day="3" data-period="8"><div class="subject-name">เคมี</div><div class="teacher-room">ครูเฉลียว<br>422</div></td>
-                    </tr>
-<tr>
-                        <td class="period-col">พ.</td>
-                        <td class="empty-cell" data-day="4" data-period="0">ว่าง</td>
-                        <td data-day="4" data-period="1"><div class="subject-name">คณิตศาสตร์</div><div class="teacher-room">ครูดวงสมร<br>325</div></td>
-                        <td data-day="4" data-period="2"><div class="subject-name">ไทย</div><div class="teacher-room">ครูมลศรี<br>422</div></td>
-                        <td data-day="4" data-period="3"><div class="subject-name">อังกฤษ 2</div><div class="teacher-room">ครูNiall<br>238</div></td>
-                        <td data-day="4" data-period="4"><div class="subject-name">จีน</div><div class="teacher-room">ครูณรงค์<br>422</div></td>
-                        <td class="empty-cell" data-day="4" data-period="5">พักเที่ยง<br>ม.ปลาย</td>
-                        <td data-day="4" data-period="6"><div class="subject-name">การงาน</div><div class="teacher-room">ครูสุมาลี<br>คหกรรม</div></td>
-                        <td data-day="4" data-period="7"><div class="subject-name">ชีววิทยา</div><div class="teacher-room">ครูกฤตนัย<br>422</div></td>
-                        <td data-day="4" data-period="8"><div class="subject-name">กิจกรรมชุมนุม</div><div class="teacher-room">-<br>-</div></td>
-                    </tr>
-                    <tr>
-                        <td class="period-col">ศ.</td>
-                        <td class="empty-cell" data-day="5" data-period="0">ว่าง</td>
-                        <td data-day="5" data-period="1"><div class="subject-name">วิทย์ชีวภาพ</div><div class="teacher-room">ครูวิรงรอง<br>422</div></td>
-                        <td data-day="5" data-period="2"><div class="subject-name">นาฏศิลป์</div><div class="teacher-room">ครูวชิรวิชญ์<br>นาฏศิลป์</div></td>
-                        <td data-day="5" data-period="3"><div class="subject-name">สังคม</div><div class="teacher-room">ครูศิลายุ<br>324</div></td>
-                        <td data-day="5" data-period="4"><div class="subject-name">อังกฤษ</div><div class="teacher-room">ครูดลฤดี<br>422</div></td>
-                        <td class="empty-cell" data-day="5" data-period="5">พักเที่ยง<br>ม.ปลาย</td>
-                        <td data-day="5" data-period="6"><div class="subject-name">คอมพิวเตอร์</div><div class="teacher-room">ครูศรัญยา<br>ICT4</div></td>
-                        <td data-day="5" data-period="7"><div class="subject-name">คณิตศาสตร์</div><div class="teacher-room">ครูดวงสมร<br>325</div></td>
-                        <td data-day="5" data-period="8"><div class="subject-name">แนะแนว</div><div class="teacher-room">ครูณัฐธมน<br>422</div></td>
-                    </tr>
-                </tbody>
-            </table></div>
-        </div>
-    </div>
-    
-    <div class="container">
-        <div class="profile-card">
-            <h1 class="title-header">Introduce</h1>
-            <div class="info-line">
-                <span class="label">Name:</span> <span id="name"></span>
-            </div>
-            <div class="info-line">
-                <span class="label">Age:</span> <span id="age"></span>
-            </div>
-            <div class="description-box">
-                <span class="label">Description</span>
-                <div class="description-text" id="description"></div>
-            </div>
-        </div>
-    </div>
+<div class="week-tabs" id="tabs"></div>
+<div id="dayViews"></div>
 
-    <div class="scroll-container">
-        <h1 class="title-header" style="text-align: center; margin-bottom: 50px; font-size: 3.5rem;">My Homework/Work</h1>
-        <div class="homework-section" id="homeworkSection">
-<div class="homework-card">
-                <h2 class="subject-title">คณิตศาสตร์</h2>
-                <div class="task-item">✅ ปริ้นเอกสาร 90 หน้า <span class="task-date">28/10/2567</span></div>
-                <div class="task-item">✅ งานที่ 1 - 1 หัวข้อใหญ่ แสดงวิธีทำข้อ 2 | 2 หัวข้อใหญ่ทำทุกข้อ <span class="task-date">10/11/2567</span></div>
-            </div>
+<div class="full-table-wrap">
+  <div class="section-label">ตารางรวมทุกวัน</div>
+  <div class="tbl-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>วัน</th>
+          <th>0<br><span style="opacity:.6;font-weight:300">08:00–08:40</span></th>
+          <th>1<br><span style="opacity:.6;font-weight:300">08:40–09:35</span></th>
+          <th>2<br><span style="opacity:.6;font-weight:300">09:35–10:30</span></th>
+          <th>3<br><span style="opacity:.6;font-weight:300">10:30–11:25</span></th>
+          <th>4(ม.ปลาย)<br><span style="opacity:.6;font-weight:300">11:25–12:20</span></th>
+          <th>พัก<br><span style="opacity:.6;font-weight:300">12:20–13:15</span></th>
+          <th>5<br><span style="opacity:.6;font-weight:300">13:15–14:10</span></th>
+          <th>6<br><span style="opacity:.6;font-weight:300">14:10–15:05</span></th>
+          <th>7<br><span style="opacity:.6;font-weight:300">15:05–16:00</span></th>
+        </tr>
+      </thead>
+      <tbody id="fullTableBody"></tbody>
+    </table>
+  </div>
+</div>
 
-            <div class="homework-card">
-                <h2 class="subject-title">ฟิสิกส์</h2>
-                <div class="task-item">✅ กฎการเคลื่อนที่ของนิวตัน จดตามสไลด์และตอบ <span class="task-date">10/11/2567</span></div>
-                <div class="task-item">✅ แรง มวล และกฎการเคลื่อนที่ จดตามสไลด์และตอบ <span class="task-date">11/11/2567</span></div>
-            </div>
+</div>
+<script>
+// schedule data — decoded from image
+// periods index: 0=คาบ0, 1=คาบ1, 2=คาบ2, 3=คาบ3, 4=คาบ4(ม.ปลาย), 5=BREAK, 6=คาบ5, 7=คาบ6, 8=คาบ7
+var sch={
+  1:{name:'จันทร์',short:'จ.',p:[
+    {s:'ชีววิทยา',c:'ว30203',t:'ภัรัตน์',r:'431',col:'#7EAB68'},
+    {s:'ชีววิทยา',c:'ว30203',t:'ภัรัตน์',r:'431',col:'#7EAB68'},
+    {s:'สังคม',c:'ส32102',t:'ปรินทร์',r:'431',col:'#9B7BB8'},
+    {s:'สังคม',c:'ส32101',t:'เพ็ญ',r:'431',col:'#9B7BB8'},
+    'break',
+    {s:'คณิตศาสตร์',c:'ค32201',t:'นนท์ทิยา',r:'431',col:'#6A8DC4'},
+    {s:'คณิตศาสตร์',c:'ค32201',t:'จิราภา',r:'431',col:'#6A8DC4'},
+    {s:'ต้านทุจริต',c:'-',t:'-',r:'-',col:'#A09090'}
+  ]},
+  2:{name:'อังคาร',short:'อ.',p:[
+    {s:'สังคม',c:'อ32101',t:'Simon',r:'227',col:'#6AA8B8'},
+    {s:'สังคม',c:'ส32101',t:'ชลิดา',r:'431',col:'#9B7BB8'},
+    {s:'คณิตศาสตร์',c:'ค32101',t:'นนท์ทิยา',r:'431',col:'#6A8DC4'},
+    {s:'วิทยาศาสตร์',c:'ว32102',t:'ชณาญ',r:'ICT3',col:'#5F9EA0'},
+    'break',
+    {s:'วิทยาศาสตร์',c:'ว32101',t:'สินา',r:'431',col:'#5F9EA0'},
+    {s:'วิทยาศาสตร์',c:'ว32101',t:'สินา',r:'431',col:'#5F9EA0'},
+    {s:'อังกฤษ',c:'อ32201',t:'จิระ',r:'431',col:'#6AA8B8'}
+  ]},
+  3:{name:'พุธ',short:'พ.',p:[
+    {s:'วิทยาศาสตร์',c:'ง32101',t:'สมคว',r:'431',col:'#5F9EA0'},
+    {s:'การงาน',c:'ง30221',t:'ดารุณี',r:'431',col:'#B89B6A'},
+    {s:'ดาราศาสตร์',c:'ว30221',t:'ดารุณี',r:'431',col:'#7B7FC4'},
+    {s:'คณิตศาสตร์',c:'ค32101',t:'นนท์ทิยา',r:'431',col:'#6A8DC4'},
+    'break',
+    {s:'สุขภาพ',c:'พ32101',t:'นราภ',r:'431',col:'#6AAE7A'},
+    {s:'ชีววิทยา',c:'ว30203',t:'ภัรัตน์',r:'431',col:'#7EAB68'},
+    {s:'ชีววิทยา',c:'ว30203',t:'ภัรัตน์',r:'431',col:'#7EAB68'}
+  ]},
+  4:{name:'พฤหัส',short:'พฤ.',p:[
+    {s:'คณิตศาสตร์',c:'ค32101',t:'นนท์ทิยา',r:'431',col:'#6A8DC4'},
+    {s:'อังกฤษ',c:'อ32201',t:'จิรเวช',r:'431',col:'#6AA8B8'},
+    {s:'การงาน',c:'ว30243',t:'จิราภา',r:'431',col:'#B89B6A'},
+    {s:'การงาน',c:'ว30243',t:'จิราภา',r:'431',col:'#B89B6A'},
+    'break',
+    {s:'แนะแนว',c:'-',t:'ลำดว',r:'431',col:'#B0A090'},
+    {s:'วิทยาศาสตร์',c:'พ32101',t:'อิสระ',r:'431',col:'#5F9EA0'},
+    {s:'กิจกรรมชุมนุม',c:'-',t:'-',r:'-',col:'#808080'}
+  ]},
+  5:{name:'ศุกร์',short:'ศ.',p:[
+    {s:'ไทย',c:'ท32101',t:'นราภ',r:'431',col:'#C48A6A'},
+    {s:'อังกฤษ',c:'อ32201',t:'นนท์ทิยา',r:'431',col:'#6AA8B8'},
+    {s:'IS',c:'I30903',t:'จารุพ',r:'511',col:'#909090'},
+    {s:'วิทยาศาสตร์',c:'ส32101',t:'คูดน',r:'431',col:'#5F9EA0'},
+    'break',
+    {s:'สังคม',c:'จ32201',t:'กานติ',r:'431',col:'#9B7BB8'},
+    {s:'ดาราศาสตร์',c:'ว30221',t:'ดารุณี',r:'431',col:'#7B7FC4'},
+    {s:'สังคม',c:'ส32101',t:'ชลิดา',r:'431',col:'#9B7BB8'}
+  ]}
+};
 
-            <div class="homework-card">
-                <h2 class="subject-title">ชีววิทยา</h2>
-                <div class="task-item">✅ เรื่องโครโมโซมและสารพันธุกรรม ข้อ 1 <span class="task-date">11/11/2567</span></div>
-            </div>
+var periods=[
+  {label:'0',start:'08:00',end:'08:40'},
+  {label:'1',start:'08:40',end:'09:35'},
+  {label:'2',start:'09:35',end:'10:30'},
+  {label:'3',start:'10:30',end:'11:25'},
+  {label:'4',start:'11:25',end:'12:20'},
+  {label:'พัก',start:'12:20',end:'13:15'},
+  {label:'5',start:'13:15',end:'14:10'},
+  {label:'6',start:'14:10',end:'15:05'},
+  {label:'7',start:'15:05',end:'16:00'}
+];
 
-            <div class="homework-card">
-                <h2 class="subject-title">อังกฤษ</h2>
-                <div class="task-item">✅ ตั้งชื่อเรื่อง (เป็นอังกฤษ) และแปลเนื้อเรื่องที่กำหนด - แปลคำศัพท์ 5 คำ <span class="task-date">11/11/2567</span></div>
-            </div>
-            
-            <div class="homework-card">
-                <h2 class="subject-title">วิทย์ชีวภาพ</h2>
-                <div class="task-item">✅ สรุปคำศัพท์จากคลิปวิดีโอ <a href="https://www.youtube.com/watch?v=WnvqfV8Hg0A" target="_blank" style="color: #da70d6; text-decoration: none; border-bottom: 2px solid #da70d6;">ที่นี่</a> <span class="task-date">14/11/2025</span></div>
-            </div>
+function toMin(t){var p=t.split(':');return+p[0]*60+ +p[1]}
+function pad(n){return n<10?'0'+n:''+n}
 
-            <div class="homework-card">
-                <h2 class="subject-title">คอมพิวเตอร์</h2>
-                <div class="task-item">✅ งานที่ 1 การเปลี่ยนแปลงของเทคโนโลยี <span class="task-date">14/11/2025</span></div>
-            </div>
+function getState(){
+  var now=new Date(),d=now.getDay(),h=now.getHours(),m=now.getMinutes();
+  var cur=h*60+m;
+  if(d===0||d===6)return{status:'weekend'};
+  if(cur<toMin('08:00'))return{status:'before'};
+  if(cur>=toMin('16:00'))return{status:'after'};
+  for(var i=0;i<periods.length;i++){
+    var p=periods[i],ps=toMin(p.start),pe=toMin(p.end);
+    if(cur>=ps&&cur<pe){
+      var left=pe-cur;
+      if(p.label==='พัก')return{status:'break',left:left,end:p.end};
+      var cl=sch[d]&&sch[d].p[i];
+      if(!cl||cl==='break')return{status:'free',left:left,end:p.end,period:i,day:d};
+      return{status:'class',data:cl,left:left,end:p.end,period:i,day:d};
+    }
+  }
+  return{status:'between'};
+}
 
-                        <div class="homework-card">
-                <h2 class="subject-title">สังคม</h2>
-                <div class="task-item">✅ จดสรุปรัฐศาสตร์ตามสไลด์ <span class="task-date">12/11/2025</span></div>
-            </div>
+function tick(){
+  var s=getState(),n=new Date();
+  document.getElementById('nowTime').textContent=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+  var txt='',remain='',warn=false;
+  if(s.status==='weekend')txt='วันหยุด';
+  else if(s.status==='before')txt='ก่อนเวลาเรียน';
+  else if(s.status==='after')txt='เลิกเรียนแล้ว';
+  else if(s.status==='break'){txt='พักเที่ยง ม.ปลาย';remain='หมดเวลา '+s.end+' — เหลืออีก '+s.left+' นาที';}
+  else if(s.status==='free'){txt='คาบว่าง';remain='เหลืออีก '+s.left+' นาที';}
+  else if(s.status==='class'&&s.data){
+    var d=s.data;
+    txt=d.s+(d.t&&d.t!=='-'?' — '+d.t:'')+(d.r&&d.r!=='-'?' · ห้อง '+d.r:'');
+    remain='เหลืออีก '+s.left+' นาที (หมดคาบ '+s.end+')';
+    warn=s.left<=10;
+  }else txt='ระหว่างคาบ';
+  document.getElementById('nowText').textContent=txt;
+  var nr=document.getElementById('nowRemain');
+  if(remain){nr.textContent=remain;nr.style.display='block';nr.className='now-remain'+(warn?' warn':'');}
+  else nr.style.display='none';
 
-            <div class="homework-card">
-                <h2 class="subject-title">นาฏศิลป์</h2>
-                <div class="task-item">📝 งานกลุ่มนาฏศิลป์ 4/2 (ไม่ทราบข้อมูลคนเขียนมันลืม)<span class="task-date">14/11/2025</span></div>
-            </div>
+  document.querySelectorAll('.period-card').forEach(function(el){el.classList.remove('current')});
+  if((s.status==='class'||s.status==='free')&&s.day&&s.period!==undefined){
+    var el=document.querySelector('[data-day="'+s.day+'"][data-period="'+s.period+'"]');
+    if(el)el.classList.add('current');
+  }
+  document.querySelectorAll('.tbl-current').forEach(function(el){el.classList.remove('tbl-current')});
+  if(s.status==='class'&&s.day&&s.period!==undefined){
+    var el2=document.querySelector('.tbl-td[data-day="'+s.day+'"][data-period="'+s.period+'"]');
+    if(el2)el2.classList.add('tbl-current');
+  }
+}
 
-            <div class="homework-card">
-                <h2 class="subject-title">เคมี</h2>
-                <div class="no-tasks">ยังไม่มีงาน</div>
-            </div>
+function buildDayView(d){
+  var day=sch[d],now=new Date().getDay();
+  var div=document.createElement('div');
+  div.className='day-view'+(d===now?' active':'');
+  div.id='dv'+d;
+  var grid=document.createElement('div');
+  grid.className='periods-grid';
+  day.p.forEach(function(cl,i){
+    var p=periods[i];
+    var row=document.createElement('div');
+    row.className='period-row';
+    var num=document.createElement('div');
+    num.className='period-num';
+    num.innerHTML='<div class="p-num">'+p.label+'</div><div class="p-time">'+p.start+'<br>'+p.end+'</div>';
+    row.appendChild(num);
+    var card=document.createElement('div');
+    card.setAttribute('data-day',d);
+    card.setAttribute('data-period',i);
+    if(cl==='break'){
+      card.className='period-card break-card';
+      card.innerHTML='<div class="break-text">พักเที่ยง ม.ปลาย</div>';
+    }else if(!cl){
+      card.className='period-card empty';
+      card.innerHTML='<span style="font-size:.8rem;color:var(--clay);opacity:.5">ว่าง</span>';
+    }else{
+      card.className='period-card has-class';
+      var roomHtml=cl.r&&cl.r!=='-'?'<span class="room-tag">'+cl.r+'</span>':'';
+      var teacherHtml=cl.t&&cl.t!=='-'?'<span>'+cl.t+'</span>':'';
+      card.innerHTML=
+        '<div class="color-tag" style="background:'+cl.col+'"></div>'+
+        '<div class="subj">'+cl.s+'</div>'+
+        '<div class="meta">'+teacherHtml+roomHtml+'</div>';
+    }
+    row.appendChild(card);
+    grid.appendChild(row);
+  });
+  div.appendChild(grid);
+  return div;
+}
 
-            <div class="homework-card">
-                <h2 class="subject-title">ไทย</h2>
-                <div class="no-tasks">ยังไม่มีงาน</div>
-            </div>
+function buildTabs(){
+  var tabs=document.getElementById('tabs'),now=new Date().getDay();
+  [1,2,3,4,5].forEach(function(d){
+    var btn=document.createElement('button');
+    btn.className='tab-btn'+(d===now?' today active':'');
+    btn.textContent=sch[d].name;
+    btn.onclick=function(){
+      document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+      document.querySelectorAll('.day-view').forEach(function(v){v.classList.remove('active')});
+      btn.classList.add('active');
+      document.getElementById('dv'+d).classList.add('active');
+    };
+    tabs.appendChild(btn);
+  });
+}
 
-            <div class="homework-card">
-                <h2 class="subject-title">IS</h2>
-                <div class="no-tasks">ยังไม่มีงาน</div>
-            </div>
-        </div>
-    </div>
+function buildFullTable(){
+  var tbody=document.getElementById('fullTableBody'),now=new Date().getDay(),s=getState();
+  [1,2,3,4,5].forEach(function(d){
+    var day=sch[d],tr=document.createElement('tr');
+    var td0=document.createElement('td');td0.textContent=day.short;tr.appendChild(td0);
+    day.p.forEach(function(cl,i){
+      var td=document.createElement('td');
+      td.className='tbl-td';
+      td.setAttribute('data-day',d);
+      td.setAttribute('data-period',i);
+      if(cl==='break'){
+        td.innerHTML='<span class="ce">พัก</span>';
+      }else if(!cl){
+        td.innerHTML='<span class="ce">—</span>';
+      }else{
+        var roomHtml=cl.r&&cl.r!=='-'?'<span class="cr">'+cl.r+'</span>':'';
+        var teacherHtml=cl.t&&cl.t!=='-'?'<span class="ct">'+cl.t+'</span>':'';
+        td.innerHTML='<div class="ci"><span class="cs">'+cl.s+'</span>'+teacherHtml+roomHtml+'</div>';
+      }
+      if(s.status==='class'&&d===now&&s.period===i)td.classList.add('tbl-current');
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
 
-    <script>
-        var scheduleData = {
-            1: {
-                0: null,
-                1: { subject: 'เคมี', teacher: 'ครูเฉลียว', room: '422' },
-                2: { subject: 'ไทย', teacher: 'ครูมลศรี', room: '422' },
-                3: { subject: 'ฟิสิกส์', teacher: 'ครูวรวุฒิ', room: '422' },
-                4: { subject: 'ฟิสิกส์', teacher: 'ครูวรวุฒิ', room: '422' },
-                5: null,
-                6: { subject: 'คณิตศาสตร์', teacher: 'ครูดวงสมร', room: '325' },
-                7: { subject: 'IS', teacher: 'ครูมลศรี', room: '422' },
-                8: { subject: 'IS', teacher: 'ครูมลศรี', room: '422' }
-            },
-            2: {
-                0: null,
-                1: null,
-                2: { subject: 'ชีววิทยา', teacher: 'ครูกฤตน', room: '422' },
-                3: { subject: 'ชีววิทยา', teacher: 'ครูกฤตน', room: '422' },
-                4: { subject: 'คณิตศาสตร์', teacher: 'ครูดวงสมร', room: '325' },
-                5: null,
-                6: { subject: 'อังกฤษ', teacher: 'ครูนันทิยา', room: '422' },
-                7: { subject: 'ฟิสิกส์', teacher: 'ครูวรวุฒิ', room: '422' },
-                8: { subject: 'ฟิสิกส์', teacher: 'ครูวรวุฒิ', room: '422' }
-            },
-            3: {
-                0: null,
-                1: { subject: 'ดาราศาสตร์', teacher: 'ครูวิชชุด', room: '422' },
-                2: { subject: 'ดาราศาสตร์', teacher: 'ครูวิชชุด', room: '422' },
-                3: { subject: 'พละศึกษา', teacher: 'ครูนฤพล', room: 'สนามอินดอร์' },
-                4: { subject: 'สังคม', teacher: 'ครูศิลายุ', room: '324' },
-                5: null,
-                6: { subject: 'คณิตศาสตร์', teacher: 'ครูดวงสมร', room: '325' },
-                7: { subject: 'เคมี', teacher: 'ครูเฉลียว', room: '422' },
-                8: { subject: 'เคมี', teacher: 'ครูเฉลียว', room: '422' }
-            },
-             4: {
-                 0: null,
-                 1: { subject: 'คณิตศาสตร์', teacher: 'ครูดวงสมร', room: '325' },
-                 2: { subject: 'ไทย', teacher: 'ครูมลศรี', room: '422' },
-                 3: { subject: 'อังกฤษ 2', teacher: 'ครูNiall', room: '238' },
-                 4: { subject: 'จีน', teacher: 'ครูณรงค์', room: '422' },
-                 5: null,
-                 6: { subject: 'การงาน', teacher: 'ครูสุมาลี', room: 'คหกรรม' },
-                 7: { subject: 'ชีววิทยา', teacher: 'ครูกฤตนัย', room: '422' },
-                 8: { subject: 'กิจกรรมชุมนุม', teacher: '-', room: '-' }
-           },
-             5: {
-                 0: null,
-                 1: { subject: 'วิทย์ชีวภาพ', teacher: 'ครูวิรงรอง', room: '422' },
-                 2: { subject: 'นาฏศิลป์', teacher: 'ครูวชิรวิชญ์', room: 'นาฏศิลป์' },
-                 3: { subject: 'สังคม', teacher: 'ครูศิลายุ', room: '324' },
-                 4: { subject: 'อังกฤษ', teacher: 'ครูดลฤดี', room: '422' },
-                 5: null,
-                 6: { subject: 'คอมพิวเตอร์', teacher: 'ครูศรัญยา', room: 'ICT4' },
-                 7: { subject: 'คณิตศาสตร์', teacher: 'ครูดวงสมร', room: '325' },
-                 8: { subject: 'แนะแนว', teacher: 'ครูณัฐธมน', room: '422' }
-           }
-        };
-
-        var periodTimes = [
-            { start: '08:00', end: '08:40' },
-            { start: '08:40', end: '09:35' },
-            { start: '09:35', end: '10:30' },
-            { start: '10:30', end: '11:25' },
-            { start: '11:25', end: '12:20' },
-            { start: '12:20', end: '13:15' },
-            { start: '13:15', end: '14:10' },
-            { start: '14:10', end: '15:05' },
-            { start: '15:05', end: '16:00' }
-        ];
-
-        function timeToMinutes(timeStr) {
-            var parts = timeStr.split(':');
-            return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-        }
-
-        function getCurrentStatus() {
-            var now = new Date();
-            var day = now.getDay();
-            var currentMinutes = now.getHours() * 60 + now.getMinutes();
-            var currentTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-
-            if (day === 0 || day === 6) {
-                return { text: 'วันหยุด', day: null, period: null, timeRemaining: null, currentTime: currentTime };
-            }
-
-            if (currentMinutes < timeToMinutes('06:00')) {
-                return { text: 'ก่อนเวลาเรียน', day: null, period: null, timeRemaining: null, currentTime: currentTime };
-            }
-
-            if (currentMinutes >= timeToMinutes('06:00') && currentMinutes < timeToMinutes('07:50')) {
-                var minutesUntil = timeToMinutes('07:50') - currentMinutes;
-                return { text: 'รอเข้าแถวเคารพธงชาติ', day: null, period: null, timeRemaining: 'อีก ' + minutesUntil + ' นาที', currentTime: currentTime };
-            }
-
-            if (currentMinutes >= timeToMinutes('07:50') && currentMinutes < timeToMinutes('08:00')) {
-                var minutesUntil = timeToMinutes('08:00') - currentMinutes;
-                return { text: 'เข้าแถวเคารพธงชาติ', day: null, period: null, timeRemaining: 'อีก ' + minutesUntil + ' นาที', currentTime: currentTime };
-            }
-
-            for (var i = 0; i < periodTimes.length; i++) {
-                var period = periodTimes[i];
-                var startMinutes = timeToMinutes(period.start);
-                var endMinutes = timeToMinutes(period.end);
-
-                if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
-                    var classInfo = scheduleData[day] && scheduleData[day][i];
-                    var minutesLeft = endMinutes - currentMinutes;
-                    var timeRemainingText = 'เหลือเวลาอีก ' + minutesLeft + ' นาที';
-                    var isWarning = minutesLeft <= 10;
-                    
-                    if (classInfo) {
-                        return { 
-                            text: 'เรียน ' + classInfo.subject + ' | ' + classInfo.teacher + ' | ' + classInfo.room,
-                            day: day,
-                            period: i,
-                            timeRemaining: timeRemainingText,
-                            isWarning: isWarning,
-                            currentTime: currentTime
-                        };
-                    } else {
-                        return { 
-                            text: 'พักเบรก', 
-                            day: null, 
-                            period: null, 
-                            timeRemaining: timeRemainingText,
-                            isWarning: false,
-                            currentTime: currentTime
-                        };
-                    }
-                }
-
-                if (i < periodTimes.length - 1) {
-                    var nextPeriod = periodTimes[i + 1];
-                    var nextStartMinutes = timeToMinutes(nextPeriod.start);
-                    if (currentMinutes >= endMinutes && currentMinutes < nextStartMinutes) {
-                        var minutesUntil = nextStartMinutes - currentMinutes;
-                        return { 
-                            text: 'รอคาบที่ ' + (i + 1), 
-                            day: null, 
-                            period: null, 
-                            timeRemaining: 'อีก ' + minutesUntil + ' นาที',
-                            isWarning: false,
-                            currentTime: currentTime
-                        };
-                    }
-                }
-            }
-
-            if (currentMinutes >= timeToMinutes('16:00')) {
-                return { text: 'เลิกเรียน', day: null, period: null, timeRemaining: null, currentTime: currentTime };
-            }
-
-            return { text: 'พักเบรก', day: null, period: null, timeRemaining: null, currentTime: currentTime };
-        }
-
-        var lastPeriod = null;
-
-function updateScheduleStatus() {
-            var status = getCurrentStatus();
-            
-            var currentTimeEl = document.getElementById('currentTime');
-            if (currentTimeEl) {
-                currentTimeEl.textContent = status.currentTime;
-            }
-            
-            var statusText = document.getElementById('statusText');
-            if (statusText) {
-                statusText.textContent = status.text;
-            }
-
-            var timeRemainingEl = document.getElementById('timeRemaining');
-            if (timeRemainingEl) {
-                if (status.timeRemaining) {
-                    timeRemainingEl.textContent = status.timeRemaining;
-                    timeRemainingEl.style.display = 'block';
-                    if (status.isWarning) {
-                        timeRemainingEl.classList.add('warning');
-                    } else {
-                        timeRemainingEl.classList.remove('warning');
-                    }
-                } else {
-                    timeRemainingEl.style.display = 'none';
-                }
-            }
-
-            var overlay = document.getElementById('highlightOverlay');
-            var allCells = document.querySelectorAll('.schedule-table td[data-day]');
-            allCells.forEach(function(cell) {
-                cell.classList.remove('current-class');
-            });
-
-            if (status.day !== null && status.period !== null) {
-                var currentCell = document.querySelector('.schedule-table td[data-day="' + status.day + '"][data-period="' + status.period + '"]');
-                if (currentCell && overlay) {
-                    currentCell.classList.add('current-class');
-                    
-                    var rect = currentCell.getBoundingClientRect();
-                    var tableRect = currentCell.closest('table').getBoundingClientRect();
-                    
-                    overlay.style.display = 'block';
-                    overlay.style.left = (rect.left - tableRect.left) + 'px';
-                    overlay.style.top = (rect.top - tableRect.top) + 'px';
-                    overlay.style.width = rect.width + 'px';
-                    overlay.style.height = rect.height + 'px';
-                    
-                    lastPeriod = status.day + '-' + status.period;
-                }
-            } else {
-                if (overlay) overlay.style.display = 'none';
-            }
-        }
-
-        function toggleSchedule() {
-            var modal = document.getElementById('scheduleModal');
-            modal.classList.toggle('active');
-            if (modal.classList.contains('active')) {
-                updateScheduleStatus();
-            }
-        }
-
-        setInterval(function() {
-            var modal = document.getElementById('scheduleModal');
-            if (modal.classList.contains('active')) {
-                updateScheduleStatus();
-            }
-        }, 1000);
-
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', function() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        function Particle() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 3 + 1;
-            this.speedX = Math.random() * 1 - 0.5;
-            this.speedY = Math.random() * 1 - 0.5;
-            this.opacity = Math.random() * 0.5 + 0.2;
-        }
-
-        Particle.prototype.update = function() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-
-            if (this.x > canvas.width) this.x = 0;
-            if (this.x < 0) this.x = canvas.width;
-            if (this.y > canvas.height) this.y = 0;
-            if (this.y < 0) this.y = canvas.height;
-        };
-
-        Particle.prototype.draw = function() {
-            ctx.fillStyle = 'rgba(138, 43, 226, ' + this.opacity + ')';
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-
-            var gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
-            gradient.addColorStop(0, 'rgba(138, 43, 226, ' + (this.opacity * 0.5) + ')');
-            gradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
-            ctx.fill();
-        };
-
-        var particles = [];
-        for (var i = 0; i < 150; i++) {
-            particles.push(new Particle());
-        }
-
-        function connectParticles() {
-            for (var i = 0; i < particles.length; i++) {
-                for (var j = i + 1; j < particles.length; j++) {
-                    var dx = particles[i].x - particles[j].x;
-                    var dy = particles[i].y - particles[j].y;
-                    var distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < 120) {
-                        ctx.strokeStyle = 'rgba(138, 43, 226, ' + (0.15 * (1 - distance / 120)) + ')';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
-        function animate() {
-            ctx.fillStyle = 'rgba(10, 0, 20, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            particles.forEach(function(particle) {
-                particle.update();
-                particle.draw();
-            });
-
-            connectParticles();
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-
-        var texts = {
-            name: 'Tape',
-            age: '16',
-            description: 'I\'m just a guy who really loves his girlfriend and enjoys coding'
-        };
-
-        function typeWriter(element, text, index, callback) {
-            if (index < text.length) {
-                element.innerHTML = text.substring(0, index + 1) + '<span class="cursor"></span>';
-                setTimeout(function() {
-                    typeWriter(element, text, index + 1, callback);
-                }, 55);
-            } else {
-                element.innerHTML = text;
-                if (callback) {
-                    setTimeout(callback, 400);
-                }
-            }
-        }
-
-        setTimeout(function() {
-            typeWriter(document.getElementById('name'), texts.name, 0, function() {
-                typeWriter(document.getElementById('age'), texts.age, 0, function() {
-                    typeWriter(document.getElementById('description'), texts.description, 0);
-                });
-            });
-        }, 2000);
-
-        var observerOptions = {
-            threshold: 0.2
-        };
-
-        var observer = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        var homeworkSection = document.getElementById('homeworkSection');
-        observer.observe(homeworkSection);
-    </script>
+buildTabs();
+var views=document.getElementById('dayViews');
+[1,2,3,4,5].forEach(function(d){views.appendChild(buildDayView(d))});
+buildFullTable();
+tick();
+setInterval(tick,1000);
+</script>
 </body>
 </html>
