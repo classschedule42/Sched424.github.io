@@ -135,19 +135,19 @@ h1 strong{font-weight:500;color:var(--rose500)}
 .now-remain.warn{color:var(--rose500);animation:softblink 1.4s infinite}
 @keyframes softblink{0%,100%{opacity:1}50%{opacity:.3}}
 
-.tabs-wrap{margin-bottom:1.6rem;animation:floatUp .9s .14s cubic-bezier(.34,1.4,.64,1) both}
-.tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 8px}
+.tabs-wrap{margin-bottom:1.6rem;animation:floatUp .9s .14s cubic-bezier(.34,1.4,.64,1) both;overflow:hidden}
+.tabs{display:flex;gap:8px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;padding:10px 4px 16px;margin:-10px -4px -16px;clip-path:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{
   flex-shrink:0;border:1px solid var(--bdr);background:var(--s0);color:var(--ink3);
   font-family:'Mitr',sans-serif;font-size:.82rem;font-weight:300;
-  padding:9px 24px;border-radius:50px;cursor:pointer;white-space:nowrap;
+  padding:10px 26px;border-radius:50px;cursor:pointer;white-space:nowrap;
   transition:transform .35s cubic-bezier(.34,1.4,.64,1),box-shadow .3s,border-color .3s,background .5s,color .4s;
 }
-.tab:hover{border-color:var(--rose300);color:var(--ink);transform:translateY(-4px) scale(1.02);box-shadow:0 8px 24px var(--glow)}
+.tab:hover{border-color:var(--rose300);color:var(--ink);transform:translateY(-4px) scale(1.03);box-shadow:0 10px 28px var(--glow),0 2px 8px rgba(217,112,96,.1)}
 .tab.is-today{border-color:var(--rose200);color:var(--rose500)}
-.tab.active{background:var(--ink);border-color:var(--ink);color:var(--bg);transform:translateY(-4px);box-shadow:0 10px 32px rgba(42,31,24,.22)}
-.tab.active.is-today{background:var(--rose500);border-color:var(--rose500);box-shadow:0 10px 36px rgba(217,112,96,.35)}
+.tab.active{background:var(--ink);border-color:var(--ink);color:var(--bg);transform:translateY(-5px);box-shadow:0 12px 36px rgba(42,31,24,.24),0 4px 12px rgba(42,31,24,.1)}
+.tab.active.is-today{background:var(--rose500);border-color:var(--rose500);box-shadow:0 12px 36px rgba(217,112,96,.38),0 4px 12px rgba(217,112,96,.18)}
 
 .day-view{display:none}
 .day-view.active{display:flex;flex-direction:column;gap:8px;animation:slideIn .45s cubic-bezier(.34,1.4,.64,1) both}
@@ -430,7 +430,7 @@ function applyDark(d){
 applyDark(isDark);
 dmBtn.onclick=function(){isDark=!isDark;applyDark(isDark);localStorage.setItem('dm',isDark?'1':'0')};
 
-var SONGS=['silly cat.mp3','Cute Circus.mp3','Cat Cafe.mp3'];
+var SONGS=['silly cat.mp3','Cute Circus.mp3','Cat Cafe.mp3','lovey meowy.mp3','cupcake.mp3','sleepy cat.mp3','hungry cat.mp3','jelly belly.mp3'];
 var currentSong=-1;
 var musicBtn=document.getElementById('musicBtn');
 var musicViz=document.getElementById('musicViz');
