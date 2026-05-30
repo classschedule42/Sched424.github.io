@@ -431,7 +431,7 @@ applyDark(isDark);
 dmBtn.onclick=function(){isDark=!isDark;applyDark(isDark);localStorage.setItem('dm',isDark?'1':'0')};
 
 var SONGS=['silly cat.mp3','Cute Circus.mp3','Cat Cafe.mp3','lovey meowy.mp3','cupcake.mp3','sleepy cat.mp3','hungry cat.mp3','jelly belly.mp3'];
-var currentSong=-1;
+var shuffleQueue=[];
 var musicBtn=document.getElementById('musicBtn');
 var musicViz=document.getElementById('musicViz');
 var iconHP=document.getElementById('iconHeadphones');
@@ -440,14 +440,17 @@ var audio=document.getElementById('bgMusic');
 var isPlaying=false;
 audio.volume=0.4;
 
-function pickNextSong(){
-  var next;
-  do{next=Math.floor(Math.random()*SONGS.length)}while(SONGS.length>1&&next===currentSong);
-  return next;
+function buildQueue(){
+  var arr=SONGS.slice();
+  for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;}
+  shuffleQueue=arr;
 }
-function loadAndPlay(idx){
-  currentSong=idx;
-  audio.src=SONGS[idx];
+function pickNextSong(){
+  if(shuffleQueue.length===0)buildQueue();
+  return shuffleQueue.shift();
+}
+function loadAndPlay(src){
+  audio.src=src;
   audio.load();
   audio.play().then(function(){
     isPlaying=true;
