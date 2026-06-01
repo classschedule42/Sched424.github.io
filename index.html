@@ -11,7 +11,7 @@
   --bg:#FDF7F2;--s0:#FFFCF9;--s1:#FFF8F4;
   --rose50:#FFF0EC;--rose100:#FDDDD5;--rose200:#F9C4B8;--rose300:#F0A898;--rose400:#E48878;--rose500:#D97060;
   --sage300:#94BF98;--sky300:#8FB8DC;--lav300:#B0A0DC;--honey300:#D4B870;--mint300:#80C8A8;--peach300:#F0B898;
-  --ink:#2A1F18;--ink2:#5A4035;--ink3:#9A8878;--ink4:#C8B8A8;--bdr:#EDE0D4;--bdr2:#F5EBE4;
+  --ink:#2A1F18;--ink2:#5A4035;--ink3:#8A7060;--ink4:#C0A898;--bdr:#EDE0D4;--bdr2:#F5EBE4;
   --p-rose-bg:#FFF0EC;--p-rose-bd:#F9C4B8;--p-rose-tx:#7a3020;
   --p-sage-bg:#EBF5EB;--p-sage-bd:#C0DDBF;--p-sage-tx:#2a5a2a;
   --p-sky-bg:#E8F3FB;--p-sky-bd:#B8D8F0;--p-sky-tx:#1a4a70;
@@ -28,14 +28,14 @@ html.dark{
   --bg:#120D0A;--s0:#1C1410;--s1:#201814;
   --rose50:#2A1810;--rose100:#3A2018;--rose200:#502C20;--rose300:#C8907C;--rose400:#D4A08C;--rose500:#E08070;
   --sage300:#7AAE80;--sky300:#70A0C8;--lav300:#9888CC;--honey300:#C4A858;--mint300:#60B890;--peach300:#D09878;
-  --ink:#F5EDE5;--ink2:#D8C8B8;--ink3:#9A8878;--ink4:#604838;--bdr:#2E2018;--bdr2:#261A12;
-  --p-rose-bg:#2A1810;--p-rose-bd:#6A3828;--p-rose-tx:#F0A890;
-  --p-sage-bg:#142018;--p-sage-bd:#3A6040;--p-sage-tx:#80CC90;
-  --p-sky-bg:#101828;--p-sky-bd:#2A4870;--p-sky-tx:#80C0E8;
-  --p-lav-bg:#180F28;--p-lav-bd:#3A2870;--p-lav-tx:#B8A8E8;
-  --p-honey-bg:#201408;--p-honey-bd:#6A4820;--p-honey-tx:#D8B870;
-  --p-mint-bg:#0E1E18;--p-mint-bd:#2A5840;--p-mint-tx:#70C8A0;
-  --p-none-bg:#1A1410;--p-none-bd:#3A2E24;--p-none-tx:#907868;
+  --ink:#F5EDE5;--ink2:#D8C8B8;--ink3:#B8A898;--ink4:#806858;--bdr:#2E2018;--bdr2:#261A12;
+  --p-rose-bg:#2A1810;--p-rose-bd:#6A3828;--p-rose-tx:#F5B8A0;
+  --p-sage-bg:#142018;--p-sage-bd:#3A6040;--p-sage-tx:#90D898;
+  --p-sky-bg:#101828;--p-sky-bd:#2A4870;--p-sky-tx:#90D0F0;
+  --p-lav-bg:#180F28;--p-lav-bd:#3A2870;--p-lav-tx:#C8B8F0;
+  --p-honey-bg:#201408;--p-honey-bd:#6A4820;--p-honey-tx:#E8C880;
+  --p-mint-bg:#0E1E18;--p-mint-bd:#2A5840;--p-mint-tx:#80D8B0;
+  --p-none-bg:#1A1410;--p-none-bd:#3A2E24;--p-none-tx:#B09888;
   --glow:rgba(224,128,112,.12);--glow2:rgba(224,128,112,.05);
   --now-bg:linear-gradient(135deg,#F5EDE5 0%,#E8D4C4 60%,#DCC4B0 100%);
   --card-shadow:0 2px 16px rgba(0,0,0,.3),0 1px 4px rgba(0,0,0,.2);
@@ -81,7 +81,25 @@ header{text-align:center;margin-bottom:3rem;animation:floatUp .9s cubic-bezier(.
 .school{display:inline-flex;align-items:center;gap:8px;font-family:'Mitr',sans-serif;font-size:.68rem;font-weight:200;letter-spacing:.22em;text-transform:uppercase;color:var(--ink3);margin-bottom:.9rem}
 .school-dot{width:4px;height:4px;border-radius:50%;background:var(--rose300);animation:dotpulse 2.4s ease-in-out infinite}
 @keyframes dotpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
-h1{font-family:'Mitr',sans-serif;font-size:clamp(2rem,5.5vw,3.2rem);font-weight:300;color:var(--ink);line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+
+/* Pen logo */
+.header-logo{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:.6rem}
+.pen-wrap{
+  width:52px;height:52px;border-radius:16px;
+  background:linear-gradient(135deg,var(--rose50),var(--s0));
+  border:1.5px solid var(--rose100);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 18px var(--glow),0 1px 4px rgba(42,31,24,.06);
+  animation:penBob 4s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes penBob{
+  0%,100%{transform:rotate(-4deg) translateY(0)}
+  50%{transform:rotate(4deg) translateY(-3px)}
+}
+html.dark .pen-wrap{background:linear-gradient(135deg,rgba(80,40,24,.4),rgba(42,28,18,.6));border-color:rgba(200,144,124,.2)}
+
+h1{font-family:'Mitr',sans-serif;font-size:clamp(2rem,5.5vw,3.2rem);font-weight:300;color:var(--ink);line-height:1;letter-spacing:-.01em}
 h1 strong{font-weight:500;color:var(--rose500)}
 .chips{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:.9rem}
 .chip{font-family:'Mitr',sans-serif;font-size:.7rem;font-weight:200;padding:5px 16px;border-radius:50px;background:var(--s0);border:1px solid var(--bdr);color:var(--ink3);letter-spacing:.05em}
@@ -135,9 +153,19 @@ h1 strong{font-weight:500;color:var(--rose500)}
 .now-remain.warn{color:var(--rose500);animation:softblink 1.4s infinite}
 @keyframes softblink{0%,100%{opacity:1}50%{opacity:.3}}
 
-.tabs-wrap{margin-bottom:1.6rem;animation:floatUp .9s .14s cubic-bezier(.34,1.4,.64,1) both;overflow:hidden}
-.tabs{display:flex;gap:8px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;padding:10px 4px 16px;margin:-10px -4px -16px;clip-path:none}
+/* Tabs — fix clip on hover animation */
+.tabs-wrap{margin-bottom:1.6rem;animation:floatUp .9s .14s cubic-bezier(.34,1.4,.64,1) both}
+.tabs{
+  display:flex;gap:8px;overflow-x:auto;overflow-y:visible;
+  scrollbar-width:none;
+  padding:10px 6px 16px;
+  /* Remove clip-path and use overflow:visible so hover lift is visible */
+}
 .tabs::-webkit-scrollbar{display:none}
+/* wrapper ensures scroll works but lift is never clipped */
+.tabs-scroll-wrap{overflow-x:auto;overflow-y:visible;scrollbar-width:none;margin:0 -6px;padding:0 6px}
+.tabs-scroll-wrap::-webkit-scrollbar{display:none}
+
 .tab{
   flex-shrink:0;border:1px solid var(--bdr);background:var(--s0);color:var(--ink3);
   font-family:'Mitr',sans-serif;font-size:.82rem;font-weight:300;
@@ -233,10 +261,11 @@ html.dark .card.now .c-room{background:rgba(0,0,0,.12);color:rgba(28,18,8,.6);bo
 @keyframes wave3{0%,100%{height:10px}50%{height:24px}}
 @keyframes wave4{0%,100%{height:18px}50%{height:6px}}
 
+/* Full-width table on desktop, card-style on mobile */
 .tbl-wrap{margin-top:3rem;animation:floatUp .9s .2s cubic-bezier(.34,1.4,.64,1) both}
 .tbl-lbl{font-family:'Mitr',sans-serif;font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink4);margin-bottom:1.1rem;font-weight:200}
 .tbl-scroll{overflow-x:auto;border-radius:24px;border:1px solid var(--bdr);box-shadow:0 4px 32px rgba(42,31,24,.05)}
-table{width:100%;border-collapse:collapse;min-width:900px;background:var(--s0)}
+table{width:100%;border-collapse:collapse;min-width:700px;background:var(--s0)}
 thead{background:var(--s1)}
 thead th{font-family:'Mitr',sans-serif;font-size:.7rem;font-weight:300;color:var(--ink3);letter-spacing:.04em;padding:16px 6px;text-align:center;border-bottom:1px solid var(--bdr);white-space:nowrap;line-height:1.7}
 thead th:first-child{text-align:left;padding-left:22px;min-width:56px}
@@ -250,12 +279,14 @@ tbody td:first-child{text-align:left;padding-left:22px;font-family:'Mitr',sans-s
   display:inline-flex;flex-direction:column;align-items:center;
   border-radius:14px;padding:9px 7px;gap:3px;width:98%;min-height:68px;justify-content:center;
   white-space:nowrap;border:1px solid transparent;
-  transition:transform .3s cubic-bezier(.34,1.4,.64,1),box-shadow .3s;
+  /* Remove transform on hover — use box-shadow only to avoid table cell overflow clip */
+  transition:box-shadow .3s;
 }
-.pill:hover{transform:scale(1.05) translateY(-2px);box-shadow:0 6px 20px var(--glow)}
+/* Pill hover: only shadow, no transform — avoids table overflow clipping */
+.pill:hover{box-shadow:0 4px 16px var(--glow)}
 .pill-s{font-family:'Mitr',sans-serif;font-size:.79rem;font-weight:400;line-height:1.2}
-.pill-t{font-size:.62rem;opacity:.72}
-.pill-r{font-size:.6rem;margin-top:1px;opacity:.6}
+.pill-t{font-size:.62rem;opacity:.8}
+.pill-r{font-size:.6rem;margin-top:1px;opacity:.75}
 .p-rose{background:var(--p-rose-bg);color:var(--p-rose-tx);border-color:var(--p-rose-bd)}
 .p-sage{background:var(--p-sage-bg);color:var(--p-sage-tx);border-color:var(--p-sage-bd)}
 .p-sky{background:var(--p-sky-bg);color:var(--p-sky-tx);border-color:var(--p-sky-bd)}
@@ -265,23 +296,42 @@ tbody td:first-child{text-align:left;padding-left:22px;font-family:'Mitr',sans-s
 .p-none{background:var(--p-none-bg);color:var(--p-none-tx);border-color:var(--p-none-bd);opacity:.55}
 .brk-pill{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;width:98%;min-height:68px;background:transparent;color:var(--ink4);font-size:.65rem;opacity:.35}
 
-td.hl .pill{transform:scale(1.06) translateY(-2px);opacity:1!important}
-td.hl .p-rose{box-shadow:0 0 0 2px var(--p-rose-tx),0 6px 20px rgba(122,48,32,.15)}
-td.hl .p-sage{box-shadow:0 0 0 2px var(--p-sage-tx),0 6px 20px rgba(42,90,42,.12)}
-td.hl .p-sky{box-shadow:0 0 0 2px var(--p-sky-tx),0 6px 20px rgba(26,74,112,.12)}
-td.hl .p-lav{box-shadow:0 0 0 2px var(--p-lav-tx),0 6px 20px rgba(58,42,112,.12)}
-td.hl .p-honey{box-shadow:0 0 0 2px var(--p-honey-tx),0 6px 20px rgba(90,58,16,.12)}
-td.hl .p-mint{box-shadow:0 0 0 2px var(--p-mint-tx),0 6px 20px rgba(26,90,58,.12)}
+td.hl .pill{opacity:1!important}
+td.hl .p-rose{box-shadow:0 0 0 2px var(--p-rose-tx),0 4px 16px rgba(122,48,32,.15)}
+td.hl .p-sage{box-shadow:0 0 0 2px var(--p-sage-tx),0 4px 16px rgba(42,90,42,.12)}
+td.hl .p-sky{box-shadow:0 0 0 2px var(--p-sky-tx),0 4px 16px rgba(26,74,112,.12)}
+td.hl .p-lav{box-shadow:0 0 0 2px var(--p-lav-tx),0 4px 16px rgba(58,42,112,.12)}
+td.hl .p-honey{box-shadow:0 0 0 2px var(--p-honey-tx),0 4px 16px rgba(90,58,16,.12)}
+td.hl .p-mint{box-shadow:0 0 0 2px var(--p-mint-tx),0 4px 16px rgba(26,90,58,.12)}
 td.hl .p-none{box-shadow:0 0 0 2px var(--p-none-tx);opacity:1}
 
-@media(max-width:600px){
+/* Mobile: show table as scrollable with smaller pills */
+@media(max-width:768px){
   .page{padding:2.5rem 1rem 4rem}
   h1{font-size:1.7rem}
   .now-clock{font-size:1.6rem}
   .p-row{grid-template-columns:44px 1fr}
-  .tbl-wrap{display:none}
   .float-wrap{top:12px;right:12px}
   .moon-wrap{top:14px;left:14px}
+  /* Keep table but make it more compact on mobile */
+  .tbl-wrap{display:block}
+  thead th{font-size:.6rem;padding:10px 3px;line-height:1.5}
+  thead th:first-child{padding-left:10px;min-width:36px}
+  tbody td:first-child{padding-left:10px;font-size:.76rem}
+  .pill{padding:6px 4px;min-height:54px;border-radius:10px}
+  .pill-s{font-size:.68rem}
+  .pill-t{font-size:.55rem}
+  .pill-r{font-size:.52rem}
+  .brk-pill{min-height:54px;font-size:.58rem}
+  table{min-width:560px}
+}
+
+@media(max-width:420px){
+  thead th{font-size:.55rem;padding:8px 2px}
+  .pill{padding:5px 3px;min-height:48px;border-radius:8px;gap:2px}
+  .pill-s{font-size:.6rem}
+  .pill-t,.pill-r{font-size:.5rem}
+  table{min-width:480px}
 }
 </style>
 </head>
@@ -311,9 +361,7 @@ td.hl .p-none{box-shadow:0 0 0 2px var(--p-none-tx);opacity:1}
         <stop offset="0%" stop-color="#C8A030" stop-opacity=".35"/>
         <stop offset="100%" stop-color="#C8A030" stop-opacity="0"/>
       </radialGradient>
-      <filter id="moonBlur">
-        <feGaussianBlur stdDeviation="0.4"/>
-      </filter>
+      <filter id="moonBlur"><feGaussianBlur stdDeviation="0.4"/></filter>
     </defs>
     <circle cx="27" cy="27" r="22" fill="url(#moonGrad)"/>
     <circle cx="27" cy="27" r="22" fill="url(#moonShadow)"/>
@@ -369,7 +417,32 @@ td.hl .p-none{box-shadow:0 0 0 2px var(--p-none-tx);opacity:1}
     โรงเรียนศรีกระนวนวิทยาคม
     <span class="school-dot"></span>
   </div>
-  <h1>ตารางเรียน <strong>ม.5/4</strong></h1>
+  <div class="header-logo">
+    <!-- Cute pen logo -->
+    <div class="pen-wrap">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- pen body -->
+        <rect x="11" y="3" width="6" height="16" rx="3" fill="var(--rose200)" stroke="var(--rose300)" stroke-width="1"/>
+        <!-- pen cap detail -->
+        <rect x="11" y="3" width="6" height="5" rx="3" fill="var(--rose400)"/>
+        <!-- clip -->
+        <rect x="15.5" y="3.5" width="1.5" height="10" rx=".75" fill="var(--rose300)" opacity=".7"/>
+        <!-- nib triangle -->
+        <path d="M11 19 L17 19 L14 24 Z" fill="var(--rose400)" stroke="var(--rose300)" stroke-width=".8" stroke-linejoin="round"/>
+        <!-- nib tip shine -->
+        <circle cx="14" cy="24" r=".8" fill="var(--rose500)"/>
+        <!-- ink dot at tip — cute sparkle -->
+        <circle cx="14" cy="25.5" r=".5" fill="var(--rose300)" opacity=".6"/>
+        <!-- highlight on barrel -->
+        <rect x="12" y="5" width="1.5" height="8" rx=".75" fill="white" opacity=".35"/>
+        <!-- small stars around pen -->
+        <path d="M7 8 L7.4 9.2 L8.6 9.2 L7.7 9.9 L8 11 L7 10.3 L6 11 L6.3 9.9 L5.4 9.2 L6.6 9.2 Z" fill="var(--rose300)" opacity=".5"/>
+        <circle cx="21" cy="12" r="1.2" fill="var(--honey300)" opacity=".55"/>
+        <circle cx="20.5" cy="7" r=".8" fill="var(--rose200)" opacity=".6"/>
+      </svg>
+    </div>
+    <h1>ตารางเรียน <strong>ม.5/4</strong></h1>
+  </div>
   <div class="chips">
     <span class="chip">ห้องประจำ 431</span>
     <span class="chip">ภาคเรียนที่ 1 / 2569</span>
@@ -392,7 +465,11 @@ td.hl .p-none{box-shadow:0 0 0 2px var(--p-none-tx);opacity:1}
   </div>
 </div>
 
-<div class="tabs-wrap"><div class="tabs" id="tabs"></div></div>
+<div class="tabs-wrap">
+  <div class="tabs-scroll-wrap">
+    <div class="tabs" id="tabs"></div>
+  </div>
+</div>
 <div id="dayViews"></div>
 
 <div class="tbl-wrap">
@@ -450,24 +527,18 @@ function pickNextSong(){
   return shuffleQueue.shift();
 }
 function loadAndPlay(src){
-  audio.src=src;
-  audio.load();
+  audio.src=src;audio.load();
   audio.play().then(function(){
-    isPlaying=true;
-    musicBtn.classList.add('playing');
-    iconHP.style.display='none';
-    iconNote.style.display='block';
-    musicViz.classList.add('show');
-    scheduleNote();
+    isPlaying=true;musicBtn.classList.add('playing');
+    iconHP.style.display='none';iconNote.style.display='block';
+    musicViz.classList.add('show');scheduleNote();
   }).catch(function(){});
 }
 function startMusic(){loadAndPlay(pickNextSong())}
 function stopMusic(){
-  audio.pause();audio.currentTime=0;
-  isPlaying=false;
+  audio.pause();audio.currentTime=0;isPlaying=false;
   musicBtn.classList.remove('playing');
-  iconHP.style.display='block';
-  iconNote.style.display='none';
+  iconHP.style.display='block';iconNote.style.display='none';
   musicViz.classList.remove('show');
 }
 audio.addEventListener('ended',function(){if(isPlaying)loadAndPlay(pickNextSong())});
@@ -481,8 +552,7 @@ var sparkles=[
 ];
 function scheduleNote(){
   if(!isPlaying)return;
-  var n=document.createElement('span');
-  n.className='note-particle';
+  var n=document.createElement('span');n.className='note-particle';
   n.innerHTML=sparkles[Math.floor(Math.random()*sparkles.length)];
   var dx=(Math.random()-.5)*56,dy=-(28+Math.random()*18);
   var rot=(Math.random()-.5)*60+'deg',rot2=(Math.random()-.5)*120+'deg';
@@ -569,8 +639,7 @@ function pillHTML(cl){
 function buildDay(d){
   var day=D[d];
   var wrap=document.createElement('div');
-  wrap.className='day-view';
-  wrap.id='dv'+d;
+  wrap.className='day-view';wrap.id='dv'+d;
   day.p.forEach(function(cl,i){
     var p=PP[i],row=document.createElement('div');row.className='p-row';
     var nc=document.createElement('div');nc.className='p-num-col';
@@ -606,10 +675,7 @@ function buildTabs(){
       var wasActive=btn.classList.contains('active');
       document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active')});
       document.querySelectorAll('.day-view').forEach(function(v){v.classList.remove('active')});
-      if(!wasActive){
-        btn.classList.add('active');
-        document.getElementById('dv'+d).classList.add('active');
-      }
+      if(!wasActive){btn.classList.add('active');document.getElementById('dv'+d).classList.add('active');}
     };
     tabs.appendChild(btn);
   });
@@ -639,6 +705,19 @@ var dv=document.getElementById('dayViews');
 buildTable();
 tick();
 setInterval(tick,1000);
+
+// Auto-open today's tab
+(function(){
+  var today=new Date().getDay();
+  if(today>=1&&today<=5){
+    var tabs=document.querySelectorAll('.tab');
+    var idx=today-1;
+    if(tabs[idx]){
+      tabs[idx].classList.add('active');
+      document.getElementById('dv'+today).classList.add('active');
+    }
+  }
+})();
 </script>
 </body>
 </html>
